@@ -1,0 +1,15 @@
+{
+  "cleaning_timestamp": "2025-05-23T19:00:24.712655",
+  "original_shape": [
+    444448,
+    18
+  ],
+  "clean_shape": [
+    444448,
+    18
+  ],
+  "changes_log": [
+    {
+      "step": "vru_time_negative_correction",
+      "description": "Converted 350 negative vru_time values to 0",
+      "records_affected": 
