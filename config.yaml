@@ -1,0 +1,9 @@
+# Configuración general del proyecto
+project_name: "Call Center 1999 Analysis"
+data_dir: "00_data/"
+processed_dir: "00_data/processed/"
+raw_dir: "00_data/raw/"
+output_dir: "03_outputs/"
+report_dir: "04_reports/"
+log_dir: "logs/"
+random_seed: 42
