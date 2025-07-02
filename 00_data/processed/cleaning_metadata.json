@@ -1,5 +1,5 @@
 {
-  "cleaning_timestamp": "2025-05-23T19:00:24.712655",
+  "cleaning_timestamp": "2025-07-02T15:40:17.849162",
   "original_shape": [
     444448,
     18
@@ -12,4 +12,61 @@
     {
       "step": "vru_time_negative_correction",
       "description": "Converted 350 negative vru_time values to 0",
-      "records_affected": 
+      "records_affected": 350
+    },
+    {
+      "step": "customer_id_conversion",
+      "description": "Converted customer_id to numeric type",
+      "records_affected": 37
+    },
+    {
+      "step": "customer_id_conversion",
+      "description": "Converted customer_id to numeric type",
+      "records_affected": 37
+    }
+  ],
+  "data_types": {
+    "vru.line": "object",
+    "call_id": "int64",
+    "customer_id": "float64",
+    "priority": "int64",
+    "type": "object",
+    "date": "object",
+    "vru_entry": "object",
+    "vru_exit": "object",
+    "vru_time": "int64",
+    "q_start": "object",
+    "q_exit": "object",
+    "q_time": "int64",
+    "outcome": "object",
+    "ser_start": "object",
+    "ser_exit": "object",
+    "ser_time": "int64",
+    "server": "object",
+    "startdate": "int64"
+  },
+  "missing_values": {
+    "vru.line": 0,
+    "call_id": 0,
+    "customer_id": 37,
+    "priority": 0,
+    "type": 0,
+    "date": 0,
+    "vru_entry": 0,
+    "vru_exit": 0,
+    "vru_time": 0,
+    "q_start": 0,
+    "q_exit": 0,
+    "q_time": 0,
+    "outcome": 0,
+    "ser_start": 0,
+    "ser_exit": 0,
+    "ser_time": 0,
+    "server": 0,
+    "startdate": 0
+  },
+  "file_sizes": {
+    "csv_mb": 48.51,
+    "parquet_mb": 10.93
+  }
+}
