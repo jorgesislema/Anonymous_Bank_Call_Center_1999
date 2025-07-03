@@ -2,7 +2,7 @@
 Módulo de Limpieza de Datos
 ============================
 
-Este módulo contiene funciones para limpiar, validar y preparar los datos del call center
+En este módulo, creamos funciones para limpiar, validar y preparar los datos del call center
 para análisis posterior. Incluye manejo de valores faltantes, outliers y inconsistencias.
 """
 
@@ -13,7 +13,7 @@ import logging
 from datetime import datetime, time
 import re
 
-# Configurar logging
+# Configuramos el logger para registrar el proceso de limpieza
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -22,12 +22,12 @@ class DataCleaner:
     """Clase para limpiar y validar datos del call center."""
     
     def __init__(self):
-        """Inicializar el limpiador de datos."""
+        """Inicializamos el limpiador de datos."""
         self.cleaning_report = {}
         
     def clean_dataset(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Proceso completo de limpieza del dataset.
+        Realizamos el proceso completo de limpieza del dataset.
         
         Args:
             df (pd.DataFrame): Dataset crudo
@@ -35,29 +35,29 @@ class DataCleaner:
         Returns:
             pd.DataFrame: Dataset limpio
         """
-        logger.info("Iniciando proceso de limpieza de datos")
+        logger.info("Iniciamos el proceso de limpieza de datos")
         
         df_clean = df.copy()
         
-        # 1. Limpiar nombres de columnas
+        # 1. Limpiamos los nombres de las columnas
         df_clean = self._clean_column_names(df_clean)
         
-        # 2. Convertir tipos de datos
+        # 2. Convertimos los tipos de los datos
         df_clean = self._convert_data_types(df_clean)
         
-        # 3. Limpiar valores faltantes
+        # 3. Limpiamos los valores faltantes
         df_clean = self._handle_missing_values(df_clean)
         
-        # 4. Validar y limpiar datos de tiempo
+        # 4. Validamos y limpiamos datos de tiempo
         df_clean = self._clean_time_data(df_clean)
         
-        # 5. Validar datos de negocio
+        # 5. Validamos los datos del negocio
         df_clean = self._validate_business_rules(df_clean)
         
-        # 6. Remover outliers
+        # 6. Removemos outliers
         df_clean = self._remove_outliers(df_clean)
         
-        # 7. Crear variables derivadas básicas
+        # 7. Creamos variables derivadas básicas
         df_clean = self._create_derived_variables(df_clean)
         
         logger.info(f"Limpieza completada. Filas: {len(df)} -> {len(df_clean)}")
@@ -65,10 +65,10 @@ class DataCleaner:
         return df_clean
     
     def _clean_column_names(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Limpiar nombres de columnas."""
+        """Limpiamos nombres de columnas."""
         df_clean = df.copy()
         
-        # Mapeo de nombres de columnas
+        # Creamos un mapeo de nombres de columnas
         column_mapping = {
             'vru+line': 'vru_line',
             'ser_start': 'service_start',
@@ -78,7 +78,7 @@ class DataCleaner:
         
         df_clean = df_clean.rename(columns=column_mapping)
         
-        # Limpiar espacios y caracteres especiales
+        # Limpiamos espacios y caracteres especiales
         df_clean.columns = df_clean.columns.str.strip().str.lower()
         
         self.cleaning_report['column_mapping'] = column_mapping
@@ -86,13 +86,13 @@ class DataCleaner:
         return df_clean
     
     def _convert_data_types(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Convertir tipos de datos apropiados."""
+        """Convertimos tipos de datos apropiados."""
         df_clean = df.copy()
         
         type_conversions = {}
         
         try:
-            # IDs como enteros nullable
+            # Convertimos IDs a enteros nullable
             if 'call_id' in df_clean.columns:
                 df_clean['call_id'] = pd.to_numeric(df_clean['call_id'], errors='coerce').astype('Int64')
                 type_conversions['call_id'] = 'Int64'
@@ -101,24 +101,24 @@ class DataCleaner:
                 df_clean['customer_id'] = pd.to_numeric(df_clean['customer_id'], errors='coerce').astype('Int64')
                 type_conversions['customer_id'] = 'Int64'
             
-            # Priority como entero pequeño
+            # Convertimos priority a entero pequeño
             if 'priority' in df_clean.columns:
                 df_clean['priority'] = pd.to_numeric(df_clean['priority'], errors='coerce').astype('Int8')
                 type_conversions['priority'] = 'Int8'
             
-            # Tiempos como enteros
+            # Convertimos tiempos a enteros
             time_columns = ['vru_time', 'q_time', 'service_time']
             for col in time_columns:
                 if col in df_clean.columns:
                     df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').astype('Int64')
                     type_conversions[col] = 'Int64'
             
-            # Fecha
+            # Parseamos la fecha
             if 'date' in df_clean.columns:
                 df_clean['date'] = self._parse_date_column(df_clean['date'])
                 type_conversions['date'] = 'datetime64[ns]'
             
-            # Campos de texto como string
+            # Convertimos campos de texto a string
             text_columns = ['type', 'outcome', 'server', 'vru_line']
             for col in text_columns:
                 if col in df_clean.columns:
@@ -160,7 +160,7 @@ class DataCleaner:
         df_clean = df.copy()
         missing_info = {}
         
-        # Para customer_id = 0, convertir a NaN (clientes no identificados)
+        # Para customer_id = 0, convertimos  a NaN 
         if 'customer_id' in df_clean.columns:
             zero_customers = (df_clean['customer_id'] == 0).sum()
             df_clean.loc[df_clean['customer_id'] == 0, 'customer_id'] = pd.NA
@@ -189,7 +189,7 @@ class DataCleaner:
         df_clean = df.copy()
         time_issues = {}
         
-        # Validar que tiempos sean positivos
+        # Validamos que los tiempos sean positivos
         time_columns = ['vru_time', 'q_time', 'service_time']
         for col in time_columns:
             if col in df_clean.columns:
@@ -198,11 +198,11 @@ class DataCleaner:
                     time_issues[f'{col}_negative'] = negative_count
                     df_clean.loc[df_clean[col] < 0, col] = pd.NA
         
-        # Validar consistencia: vru_time + q_time + service_time debería ser razonable
+        # Validamos la consistencia: vru_time + q_time + service_time debería ser razonable
         if all(col in df_clean.columns for col in time_columns):
             total_time = df_clean[time_columns].sum(axis=1, skipna=True)
             
-            # Identificar llamadas con tiempos extremos (más de 2 horas = 7200 segundos)
+            # Identificamos las  llamadas con tiempos extremos (más de 2 horas = 7200 segundos)
             extreme_times = total_time > 7200
             time_issues['extreme_total_time'] = extreme_times.sum()
         
@@ -211,30 +211,30 @@ class DataCleaner:
         return df_clean
     
     def _validate_business_rules(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Validar reglas de negocio específicas del call center."""
+        """Validamos las  reglas de negocio específicas del call center."""
         df_clean = df.copy()
         validation_issues = {}
         
-        # Validar valores de priority
+        # Validamos valores de priority
         if 'priority' in df_clean.columns:
             valid_priorities = [0, 1, 2]
             invalid_priority = ~df_clean['priority'].isin(valid_priorities)
             validation_issues['invalid_priority'] = invalid_priority.sum()
             df_clean.loc[invalid_priority, 'priority'] = pd.NA
         
-        # Validar tipos de servicio
+        # Validamos los tipos de servicio
         if 'type' in df_clean.columns:
             valid_types = ['PS', 'PE', 'IN', 'NE', 'NW', 'TT']
             invalid_type = ~df_clean['type'].isin(valid_types)
             validation_issues['invalid_type'] = invalid_type.sum()
         
-        # Validar outcomes
+        # Validamos  outcomes
         if 'outcome' in df_clean.columns:
             valid_outcomes = ['AGENT', 'HANG', 'PHANTOM']
             invalid_outcome = ~df_clean['outcome'].isin(valid_outcomes)
             validation_issues['invalid_outcome'] = invalid_outcome.sum()
         
-        # Validar que las fechas estén en 1999
+        # Validamos las fechas que estén en 1999
         if 'date' in df_clean.columns:
             invalid_year = df_clean['date'].dt.year != 1999
             validation_issues['invalid_year'] = invalid_year.sum()
@@ -245,11 +245,11 @@ class DataCleaner:
         return df_clean
     
     def _remove_outliers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Remover outliers estadísticos."""
+        """Removemos outliers estadísticos."""
         df_clean = df.copy()
         outlier_info = {}
         
-        # Remover outliers en tiempos usando IQR
+        # Removemos los outliers en tiempos usando IQR
         time_columns = ['vru_time', 'q_time', 'service_time']
         
         for col in time_columns:
@@ -258,7 +258,7 @@ class DataCleaner:
                 Q3 = df_clean[col].quantile(0.75)
                 IQR = Q3 - Q1
                 
-                lower_bound = Q1 - 3 * IQR  # Más conservador que 1.5 * IQR
+                lower_bound = Q1 - 3 * IQR  
                 upper_bound = Q3 + 3 * IQR
                 
                 outliers = (df_clean[col] < lower_bound) | (df_clean[col] > upper_bound)
@@ -273,10 +273,10 @@ class DataCleaner:
         return df_clean
     
     def _create_derived_variables(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Crear variables derivadas básicas."""
+        """Creamos las variables derivadas básicas."""
         df_clean = df.copy()
         
-        # Extraer información de fecha
+        # Extraemos la información de fecha
         if 'date' in df_clean.columns:
             df_clean['year'] = df_clean['date'].dt.year
             df_clean['month'] = df_clean['date'].dt.month
@@ -301,7 +301,7 @@ class DataCleaner:
         return df_clean
     
     def get_cleaning_report(self) -> Dict[str, Any]:
-        """Obtener reporte completo de limpieza."""
+        """Obtenemos el reporte completo de limpieza."""
         return self.cleaning_report
 
 
@@ -324,7 +324,7 @@ def remove_outliers(df: pd.DataFrame,
                    method: str = 'iqr',
                    threshold: float = 3.0) -> pd.DataFrame:
     """
-    Remover outliers de columnas específicas.
+    Removemos los outliers de columnas específicas.
     
     Args:
         df (pd.DataFrame): Dataset
@@ -365,15 +365,15 @@ if __name__ == "__main__":
     from data_ingestion import load_data
     
     try:
-        # Cargar datos
+        # Cargamos los datos
         df = load_data()
         print(f"Datos originales: {df.shape}")
         
-        # Limpiar datos
+        # Limpiamos los datos
         df_clean = clean_dataset(df)
         print(f"Datos limpios: {df_clean.shape}")
         
-        # Mostrar algunos estadísticos
+        # Mostramos algunos datos estadísticos
         print("\nPrimeras 5 filas del dataset limpio:")
         print(df_clean.head())
         
