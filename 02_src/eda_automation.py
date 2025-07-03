@@ -6,6 +6,7 @@ Automatización del Análisis Exploratorio de Datos del Call Center
 Este módulo automatiza la ejecución del análisis exploratorio para generar
 insights clave sobre los datos del call center de forma programática.
 """
+# Bibiotecas necesarias
 
 import pandas as pd
 import numpy as np
@@ -62,7 +63,7 @@ class CallCenterEDA:
             return False
     
     def generate_summary_stats(self):
-        """Generar estadísticas descriptivas avanzadas"""
+        """Generamos las estadísticas descriptivas avanzadas"""
         logger.info("Generando estadísticas descriptivas...")
         
         summary = {
@@ -85,14 +86,14 @@ class CallCenterEDA:
         return summary
     
     def analyze_temporal_patterns(self):
-        """Analizar patrones temporales"""
+        """Analizamos los patrones temporales"""
         logger.info("Analizando patrones temporales...")
         
-        # Convertir date a datetime si no lo está
+        # Convertimos date a datetime si no lo está
         if 'date' in self.df.columns:
             self.df['date'] = pd.to_datetime(self.df['date'])
             
-            # Crear características temporales
+            # Creamos las  características temporales
             self.df['day_of_week'] = self.df['date'].dt.day_name()
             self.df['month'] = self.df['date'].dt.month
             self.df['quarter'] = self.df['date'].dt.quarter
@@ -144,7 +145,7 @@ class CallCenterEDA:
             }
         }
         
-        print("\n☎️ ANÁLISIS DE CALL CENTER")
+        print("\n ANÁLISIS DE CALL CENTER")
         print("=" * 50)
         print("Distribución de resultados:")
         for outcome, count in outcome_stats.items():
@@ -220,7 +221,7 @@ class CallCenterEDA:
         if len(numeric_cols) > 1:
             correlation_matrix = self.df[numeric_cols].corr()
             
-            # Crear heatmap
+            # Creamos heatmap
             plt.figure(figsize=(10, 8))
             sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0,
                        square=True, linewidths=0.5)
@@ -231,7 +232,7 @@ class CallCenterEDA:
             self.insights['correlations'] = correlation_matrix.to_dict()
     
     def detect_outliers(self):
-        """Detectar valores atípicos en variables clave"""
+        """Detectamos los valores atípicos en variables clave"""
         logger.info("Detectando valores atípicos...")
         
         outliers_summary = {}
@@ -268,11 +269,11 @@ class CallCenterEDA:
         """Ejecutar análisis completo"""
         logger.info("Iniciando análisis exploratorio completo...")
         
-        # Cargar datos
+        # Cargamos los datos
         if not self.load_data():
             return False
         
-        # Ejecutar todos los análisis
+        # Ejecutamos todos los análisis
         self.generate_summary_stats()
         self.analyze_temporal_patterns()
         self.analyze_call_center_behavior()
@@ -280,7 +281,7 @@ class CallCenterEDA:
         self.detect_outliers()
         self.create_visualizations(save_dir)
         
-        # Guardar insights
+        # Guardamos los insights
         if save_dir:
             insights_file = os.path.join(save_dir, 'eda_insights.json')
             with open(insights_file, 'w', encoding='utf-8') as f:
@@ -321,10 +322,10 @@ def main():
     data_path = "../00_data/processed/call_center_clean.parquet"
     output_dir = "../03_outputs/eda_results"
     
-    # Crear instancia de EDA
+    # Creamos instancia de EDA
     eda = CallCenterEDA(data_path)
     
-    # Ejecutar análisis completo
+    # Ejecutamos el análisis completo
     success = eda.run_complete_analysis(save_dir=output_dir)
     
     if success:
