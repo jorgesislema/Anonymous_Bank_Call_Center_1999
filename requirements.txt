@@ -1,0 +1,42 @@
+# Análisis de Datos y Ciencia de Datos - Compatibilidad Python 3.13
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.14.0
+scikit-learn>=1.4.0
+
+# Visualización
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Manipulación de fechas y tiempo
+python-dateutil>=2.8.0
+
+# Análisis estadístico avanzado
+statsmodels>=0.14.0
+
+# Jupyter y notebooks
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+
+# Desarrollo web para dashboards
+streamlit>=1.23.0
+dash>=2.16.0
+dash-bootstrap-components>=1.4.0
+
+# Utilidades para data science
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+
+# Machine Learning avanzado
+xgboost>=2.0.0
+
+# Configuración y logging
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=7.3.0
+pytest-cov>=4.1.0
+
+# Yaml para configuración
+pyyaml>=6.0.0
