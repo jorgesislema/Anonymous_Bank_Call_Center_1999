@@ -1,10 +1,55 @@
-# 🏦 Análisis Integral del Call Center - Anonymous Bank
+# Análisis Integral del Call Center - Anonymous Bank
 
-## 📋 Descripción del Proyecto
+## Contexto Histórico
+
+El conjunto de datos fue meticulosamente recopilado en el call center de un banco israelí, denominado "Anonymous Bank" para proteger su identidad, y cubre todas las llamadas registradas durante el año completo de 1999, desde el 1 de enero hasta el 31 de diciembre. Fue puesto a disposición del público para fines de investigación por Ilan Guedj y Avi Mandelbaum, de la Facultad de Ingeniería Industrial y Gestión de la Universidad Technion en Haifa, Israel. Este origen académico es fundamental para entender su amplio uso y el rigor de los análisis que ha inspirado.
+
+La escala del conjunto de datos es notable. Contiene registros de aproximadamente 450,000 llamadas, que se desglosan más específicamente en 444,431 eventos distribuidos en 54,471 casos de clientes. Este volumen proporciona una base estadísticamente robusta para realizar análisis detallados y extraer conclusiones fiables sobre el comportamiento del sistema.
+
+### El Flujo Documentado del Cliente
+
+La documentación y los estudios posteriores permiten reconstruir con precisión el viaje de un cliente a través del sistema del "Anonymous Bank":
+
+1. **Entrada al Sistema**: Un cliente llama a uno de los varios números de teléfono del banco, lo que lo conecta inmediatamente con una Unidad de Respuesta de Voz (VRU), la puerta de entrada automatizada del sistema.
+2. **Interacción con la VRU**: Dentro de la VRU, el cliente tiene dos opciones principales: completar su transacción de forma totalmente automatizada o indicar la necesidad de hablar con un agente humano.
+3. **Transferencia Directa**: Si un agente está disponible en el momento en que el cliente solicita asistencia humana, la llamada se transfiere directamente. En este escenario ideal, el tiempo de espera en cola es cero.
+4. **Entrada a la Cola**: Si todos los agentes están ocupados, la llamada se coloca en una tele-cola. Esta cola opera bajo un principio estricto de Primero en Entrar, Primero en Salir (FCFS). El registro de tiempo `q_start` marca el momento exacto en que la llamada entra en esta fase de espera.
+5. **Abandono Potencial**: Mientras esperan en la cola, los clientes pueden optar por colgar antes de ser atendidos por un agente. Este evento se conoce como abandono y es una métrica crítica de la insatisfacción del cliente.
+6. **Llegada al Servicio Humano**: El registro de tiempo `vru_exit` es un punto de datos crucial. Marca el momento en que el cliente sale del sistema automatizado, ya sea para hablar inmediatamente con un agente o para unirse a la cola. Desde la perspectiva del análisis de colas, este es el momento de "llegada" al sistema de servicio humano.
+
+### Estructura de Datos y Variables Clave
+
+Los datos están organizados en archivos de texto mensuales, lo que facilita su manejo. Un detalle operativo crucial es el horario del call center: de domingo a jueves, opera de 7:00 a 24:00. El horario se reduce los viernes, cerrando a las 14:00, y se reanuda el sábado por la noche, alrededor de las 20:00, en observancia del Sabbat. Esta variabilidad es un factor esencial para cualquier análisis de series temporales.
+
+La siguiente tabla consolida las variables más importantes del conjunto de datos, proporcionando un diccionario unificado para comprender los análisis que se presentan a continuación.
+
+| Nombre de la Variable | Descripción | Tipo | Valores Posibles |
+|-----------------------|-------------|------|------------------|
+| `vru.line`           | Identificador de 6 dígitos para la VRU y la línea específicas por las que entró la llamada. | String | AA01-1 a AA06-16 |
+| `call.id`            | Un identificador único asignado a cada llamada entrante. | Integer | 5 dígitos |
+| `customer.id`        | Un identificador único para un cliente existente. Un valor de cero indica un no-cliente o un llamante no identificado. | Integer | 0-12 dígitos |
+| `priority`           | Nivel de prioridad del cliente: 0 o 1 para clientes no identificados/regulares, 2 para clientes prioritarios que obtienen una posición avanzada en la cola. | Integer | 0, 1, 2 |
+| `type`               | El tipo de servicio solicitado, p. ej., 'PS' para 'Peilut Shotefet' (actividad regular). | String | PS, PE, IN, NE, NW, TT |
+| `date`               | La fecha de la llamada en formato 99MMDD. | Date | YYMMDD |
+| `vru_entry`          | La hora en que la llamada entró con éxito en la VRU (hh:mm:ss). | Time | HHMMSS |
+| `vru_exit`           | La hora en que la llamada salió de la VRU para dirigirse a un agente o a una cola. | Time | HHMMSS |
+| `vru_time`           | El tiempo calculado en segundos que se pasó en la VRU. | Integer | 1-999 |
+| `q_start`            | La hora en que la llamada se unió a la cola (00:00:00 si no hubo espera en cola). | Time | HHMMSS |
+| `q_exit`             | La hora en que la llamada salió de la cola (ya sea atendida o abandonada). | Time | HHMMSS |
+| `q_time`             | El tiempo calculado en segundos que se pasó en la cola. | Integer | 1-999 |
+| `outcome`            | El resultado de la llamada (p. ej., Atendida, Abandonada). | String | AGENT, HANG, PHANTOM |
+| `ser_start`          | La hora en que el agente comenzó el servicio. | Time | HHMMSS |
+| `ser_exit`           | La hora en que el agente finalizó el servicio. | Time | HHMMSS |
+| `ser_time`           | El tiempo calculado en segundos que el agente dedicó al servicio. | Integer | 1-999 |
+| `day.of.week`        | El día de la semana, añadido por conveniencia en algunos análisis. | Integer | 0-6 |
+
+---
+
+## Descripción del Proyecto
 
 Este proyecto realiza un análisis exhaustivo de los datos del call center del "Anonymous Bank" correspondientes al año 1999. Implementamos un pipeline completo de ETL (Extract, Transform, Load), EDA (Exploratory Data Analysis) y modelado predictivo para optimizar las operaciones del call center.
 
-## 🎯 Objetivos del Proyecto
+## Objetivos del Proyecto
 
 ### Objetivos Principales
 - **Análisis Operacional**: Identificar patrones en volumen de llamadas, tiempos de espera y eficiencia del servicio
@@ -19,7 +64,7 @@ Este proyecto realiza un análisis exhaustivo de los datos del call center del "
 - **Modelos Predictivos**: Implementar ML para forecasting y clasificación
 - **Recomendaciones Estratégicas**: Proponer mejoras operacionales basadas en datos
 
-## 🏗️ Arquitectura del Proyecto
+## Arquitectura del Proyecto
 
 ```
 call_center_analysis/
@@ -86,7 +131,7 @@ call_center_analysis/
 └── README.md                  # Este archivo
 ```
 
-## 📊 Descripción del Dataset
+## Descripción del Dataset
 
 ### Información General
 - **Período**: 1 de enero de 1999 - 31 de diciembre de 1999
@@ -124,7 +169,7 @@ call_center_analysis/
 - **NW**: Cliente Prospecto
 - **TT**: Callback solicitado por cliente
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Prerrequisitos
 - Python 3.8+
@@ -165,7 +210,7 @@ cp .env.template .env
 pytest tests/
 ```
 
-## 📈 Metodología de Análisis
+## Metodología de Análisis
 
 ### Fase 1: ETL (Extract, Transform, Load)
 1. **Extracción**: Carga de datos desde CSV
@@ -187,7 +232,7 @@ pytest tests/
 3. **Modelado Predictivo**: Forecasting y clasificación
 4. **Optimización**: Simulación de escenarios
 
-## 🛠️ Herramientas y Tecnologías
+## Herramientas y Tecnologías
 
 ### Análisis de Datos
 - **Python**: Lenguaje principal
@@ -206,7 +251,7 @@ pytest tests/
 - **XGBoost/LightGBM**: Boosting algorithms
 - **Statsmodels**: Análisis estadístico avanzado
 
-## 📊 Análisis Propuestos
+## Análisis Propuestos
 
 ### 1. Análisis Operacional
 - Distribución de llamadas por hora/día/mes
@@ -232,7 +277,7 @@ pytest tests/
 - Comparación de performance entre agentes
 - Identificación de mejores prácticas
 
-## 🎯 KPIs y Métricas Clave
+## KPIs y Métricas Clave
 
 ### Métricas Operacionales
 - **Average Handle Time (AHT)**: Tiempo promedio de manejo
@@ -252,7 +297,7 @@ pytest tests/
 - **Repeat Call Rate**: Tasa de llamadas repetidas
 - **Agent Performance**: Performance por agente
 
-## 📋 Fuentes de Datos Adicionales Requeridas
+## Fuentes de Datos Adicionales Requeridas
 
 ### Datos Internos Necesarios
 1. **Maestro de Agentes**
@@ -281,7 +326,7 @@ pytest tests/
    - Estándares de servicio
    - Mejores prácticas del sector
 
-## 🚀 Pasos para Ejecutar el Análisis
+## Pasos para Ejecutar el Análisis
 
 ### 1. Preparación Inicial
 ```bash
@@ -313,7 +358,7 @@ jupyter notebook 01_notebooks/03_exploratory_data_analysis.ipynb
 streamlit run 03_dashboards/streamlit/app.py
 ```
 
-## 👥 Equipo y Contribuidores
+## Equipo y Contribuidores
 
 ### Roles Sugeridos
 - **Data Scientist**: Análisis y modelado
@@ -321,14 +366,14 @@ streamlit run 03_dashboards/streamlit/app.py
 - **Business Analyst**: Interpretación de resultados
 - **Visualization Specialist**: Dashboards y reportes
 
-## 📞 Contacto y Soporte
+##  Contacto y Soporte
 
 Para preguntas o sugerencias sobre este proyecto:
 - 📧 Email: [tu-email@empresa.com]
 - 💬 Slack: #call-center-analysis
-- 📚 Wiki: [Link a documentación interna]
+- Wiki: [Link a documentación interna]
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es propiedad de [Tu Empresa] y está sujeto a las políticas internas de uso de datos.
 
