@@ -109,11 +109,6 @@ call_center_analysis/
 │   └── dash/
 │       └── interactive_dashboard.py
 │
-├── 04_reports/                 # Reportes y documentación
-│   ├── figures/                # Gráficos y visualizaciones
-│   ├── executive_summary.pdf
-│   ├── technical_report.md
-│   └── presentation.pptx
 │
 ├── tests/                      # Tests unitarios
 │   ├── test_data_cleaning.py
