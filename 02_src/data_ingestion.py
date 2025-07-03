@@ -13,7 +13,7 @@ from typing import Optional, Dict, Any, Tuple
 import logging
 from pathlib import Path
 
-# Configurar logging
+# Configuramos el logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class DataIngestion:
     
     def __init__(self, data_path: str = "00_data/raw/"):
         """
-        Inicializar la clase de ingesta de datos.
+        Inicializamos la clase de ingesta de datos.
         
         Args:
             data_path (str): Ruta a la carpeta de datos raw
@@ -38,7 +38,7 @@ class DataIngestion:
     
     def load_call_center_data(self, filename: str = "Call_Center_1999_DataSet.csv") -> pd.DataFrame:
         """
-        Cargar el dataset principal del call center.
+        Cargamos el dataset principal del call center.
         
         Args:
             filename (str): Nombre del archivo CSV
@@ -56,11 +56,11 @@ class DataIngestion:
             raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
         
         try:
-            # Cargar datos con encoding adecuado
+            # Cargamos los datos con encoding adecuado
             df = pd.read_csv(file_path, encoding='utf-8')
             logger.info(f"Datos cargados exitosamente: {df.shape[0]} filas, {df.shape[1]} columnas")
             
-            # Validar estructura básica
+            # Validamos la estructura básica
             self._validate_basic_structure(df)
             
             return df
@@ -79,11 +79,11 @@ class DataIngestion:
         Raises:
             ValueError: Si la estructura no es válida
         """
-        # Verificar número mínimo de columnas
+        # Verificamos el número mínimo de columnas
         if df.shape[1] < 15:
             raise ValueError(f"Dataset tiene muy pocas columnas: {df.shape[1]}")
         
-        # Verificar que no esté vacío
+        # Verificamos que no esté vacío
         if df.empty:
             raise ValueError("Dataset está vacío")
         
@@ -112,7 +112,7 @@ class DataIngestion:
     
     def detect_data_types(self, df: pd.DataFrame) -> Dict[str, str]:
         """
-        Detectar y sugerir tipos de datos apropiados.
+        Detectamos y sugerimos si los tipos de datos son los apropiados.
         
         Args:
             df (pd.DataFrame): Dataset a analizar
@@ -157,7 +157,7 @@ def load_data(filename: str = "Call_Center_1999_DataSet.csv",
 
 def validate_data_format(df: pd.DataFrame) -> Tuple[bool, Dict[str, str]]:
     """
-    Validar el formato de los datos cargados.
+    Validamos  el formato de los datos cargados.
     
     Args:
         df (pd.DataFrame): Dataset a validar
@@ -176,12 +176,12 @@ def validate_data_format(df: pd.DataFrame) -> Tuple[bool, Dict[str, str]]:
             errors[col] = f"Columna requerida '{col}' no encontrada"
             is_valid = False
     
-    # Validar que call_id sea único
+    # Validamos que call_id sea único
     if 'call_id' in df.columns and df['call_id'].duplicated().any():
         errors['call_id'] = "call_id contiene valores duplicados"
         is_valid = False
     
-    # Validar valores de outcome
+    # Validamos los valores valores de outcome
     if 'outcome' in df.columns:
         valid_outcomes = ['AGENT', 'HANG', 'PHANTOM']
         invalid_outcomes = df[~df['outcome'].isin(valid_outcomes)]['outcome'].unique()
@@ -199,7 +199,7 @@ if __name__ == "__main__":
         print(f"Datos cargados: {df.shape}")
         print(f"Columnas: {list(df.columns)}")
         
-        # Validar formato
+        # Validamos el formato
         is_valid, errors = validate_data_format(df)
         if is_valid:
             print(" Datos válidos")
