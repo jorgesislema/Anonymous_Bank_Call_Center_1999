@@ -16,7 +16,7 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-# Configurar logging
+# Configuramos el logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class FeatureEngineer:
         
     def create_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Crear conjunto completo de features para análisis.
+        Creamos un conjunto completo de features para análisis.
         
         Args:
             df (pd.DataFrame): Dataset limpio
@@ -68,7 +68,7 @@ class FeatureEngineer:
         return df_featured
     
     def _create_temporal_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Crear features temporales avanzadas."""
+        """Creamos los features temporales avanzadas."""
         df_featured = df.copy()
         
         if 'date' in df_featured.columns:
@@ -103,7 +103,7 @@ class FeatureEngineer:
                 hour_col = f'{col}_hour'
                 df_featured[hour_col] = self._extract_hour_from_time(df_featured[col])
                 
-                # Categorizar en períodos del día
+                # Categorizamos en períodos del día
                 if col == 'vru_entry':
                     df_featured['call_period'] = self._categorize_time_period(df_featured[hour_col])
         
@@ -125,7 +125,7 @@ class FeatureEngineer:
         return date_series.isin(holiday_dates)
     
     def _extract_hour_from_time(self, time_series: pd.Series) -> pd.Series:
-        """Extraer hora de strings de tiempo en formato HHMMSS."""
+        """Extraemos la hora de strings de tiempo en formato HHMMSS."""
         def parse_hour(time_str):
             try:
                 if pd.isna(time_str) or time_str == '0:00:00':
@@ -243,18 +243,18 @@ class FeatureEngineer:
         df_featured = df.copy()
         
         if 'customer_id' in df_featured.columns:
-            # Identificar clientes vs prospectos
+            # Identificamos los clientes vs prospectos
             df_featured['is_identified_customer'] = df_featured['customer_id'].notna()
             df_featured['is_prospect'] = df_featured['customer_id'].isna()
             
-            # Agregar features por cliente (se calculan por separado)
+            # Agregamos los features por cliente 
             customer_stats = self._calculate_customer_statistics(df_featured)
             df_featured = df_featured.merge(customer_stats, on='customer_id', how='left')
         
         return df_featured
     
     def _calculate_customer_statistics(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Calcular estadísticas agregadas por cliente."""
+        """Calculamos las estadísticas agregadas por cliente."""
         customer_stats = df.groupby('customer_id').agg({
             'call_id': 'count',  # Número de llamadas
             'service_time': ['mean', 'sum'],  # Tiempo promedio y total de servicio
@@ -263,13 +263,13 @@ class FeatureEngineer:
             'priority': 'first'  # Prioridad del cliente
         }).round(2)
         
-        # Aplanar nombres de columnas
+        # Aplanamos nombres de columnas
         customer_stats.columns = [
             'customer_call_count', 'avg_service_time', 'total_service_time',
             'avg_queue_time', 'abandonment_rate', 'customer_priority'
         ]
         
-        # Categorizar frecuencia de llamadas
+        # Categorizamos las frecuencia de llamadas
         customer_stats['customer_frequency_category'] = pd.cut(
             customer_stats['customer_call_count'],
             bins=[0, 1, 3, 10, float('inf')],
@@ -279,20 +279,20 @@ class FeatureEngineer:
         return customer_stats.reset_index()
     
     def _create_workload_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Crear features de análisis de carga de trabajo."""
+        """Creamos los features de análisis de carga de trabajo."""
         df_featured = df.copy()
         
         # Features de carga por fecha y hora
         if 'date' in df_featured.columns and 'vru_entry_hour' in df_featured.columns:
-            # Contar llamadas por día
+            # Contamos las llamadas por día
             daily_calls = df_featured.groupby('date').size()
             df_featured['daily_call_volume'] = df_featured['date'].map(daily_calls)
             
-            # Contar llamadas por hora del día
+            # Contamos las llamadas por hora del día
             hourly_calls = df_featured.groupby('vru_entry_hour').size()
             df_featured['hourly_call_volume'] = df_featured['vru_entry_hour'].map(hourly_calls)
             
-            # Categorizar volumen de llamadas
+            # Categorizamos el volumen de llamadas
             df_featured['volume_category'] = pd.cut(
                 df_featured['daily_call_volume'],
                 bins=[0, 50, 100, 200, float('inf')],
@@ -302,10 +302,10 @@ class FeatureEngineer:
         return df_featured
     
     def _create_aggregated_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Crear features estadísticas agregadas."""
+        """Creamos los  features de estadísticas agregadas."""
         df_featured = df.copy()
         
-        # Features de agente (si hay información de servidor)
+        # Features de agente 
         if 'server' in df_featured.columns and df_featured['server'].notna().any():
             agent_stats = df_featured.groupby('server').agg({
                 'service_time': ['mean', 'count'],
@@ -320,7 +320,7 @@ class FeatureEngineer:
         return df_featured
     
     def _encode_categorical_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Codificar variables categóricas."""
+        """Codificamos las variables categóricas."""
         df_featured = df.copy()
         
         # One-hot encoding para variables categóricas principales
@@ -350,7 +350,7 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def engineer_time_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Crear solo features temporales.
+    Creamos solo features temporales.
     
     Args:
         df (pd.DataFrame): Dataset
@@ -364,7 +364,7 @@ def engineer_time_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_customer_segments(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Crear segmentos de clientes basados en comportamiento.
+    Creamos los segmentos de clientes basados en comportamiento.
     
     Args:
         df (pd.DataFrame): Dataset
@@ -375,7 +375,7 @@ def create_customer_segments(df: pd.DataFrame) -> pd.DataFrame:
     df_segmented = df.copy()
     
     if 'customer_id' in df_segmented.columns:
-        # Calcular métricas por cliente
+        # Calculamos las métricas por cliente
         customer_metrics = df_segmented.groupby('customer_id').agg({
             'call_id': 'count',
             'service_time': 'mean',
@@ -386,7 +386,7 @@ def create_customer_segments(df: pd.DataFrame) -> pd.DataFrame:
         
         customer_metrics.columns = ['call_frequency', 'avg_service_time', 'avg_queue_time', 'abandonment_rate', 'priority']
         
-        # Crear segmentos simples
+        # Creamos los segmentos simples
         def create_segment(row):
             if row['priority'] == 2:
                 return 'VIP'
@@ -417,16 +417,16 @@ if __name__ == "__main__":
     from data_cleaning import clean_dataset
     
     try:
-        # Cargar y limpiar datos
+        # Cargamos y limpiamos los datos
         df = load_data()
         df_clean = clean_dataset(df)
         print(f"Datos limpios: {df_clean.shape}")
         
-        # Crear features
+        # Creamos los features
         df_featured = create_features(df_clean)
         print(f"Datos con features: {df_featured.shape}")
         
-        # Mostrar nuevas columnas
+        # Mostramos las nuevas columnas
         new_columns = set(df_featured.columns) - set(df_clean.columns)
         print(f"\nNuevas features creadas ({len(new_columns)}):")
         for col in sorted(new_columns):
